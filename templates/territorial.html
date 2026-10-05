@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% block titulo %}Dimensión territorial{% endblock %}
+{% block contenido %}
+<h1>Dimensión territorial</h1>
+<p>¿Cómo se distribuye la población y sus principales características entre los territorios disponibles?</p>
+
+<form method="get" class="row g-3 mb-4">
+  <div class="col-md-5">
+    <label for="nivel" class="form-label">Ver por</label>
+    <select id="nivel" name="nivel" class="form-select" onchange="this.form.submit()">
+      {% for k, v in niveles.items() %}<option value="{{ k }}" {{ 'selected' if k == nivel }}>{{ v }}</option>{% endfor %}
+    </select>
+  </div>
+  <div class="col-md-4">
+    <label for="ambito" class="form-label">Ámbito</label>
+    <select id="ambito" name="ambito" class="form-select" onchange="this.form.submit()">
+      {% for k, v in ambitos.items() %}<option value="{{ k }}" {{ 'selected' if k == ambito }}>{{ v }}</option>{% endfor %}
+    </select>
+  </div>
+</form>
+
+{% if error %}
+<div class="alert alert-warning">{{ error }}</div>
+{% else %}
+<div class="row g-3 mb-4">
+  <div class="col-6 col-lg-3"><strong>{{ "{:,}".format(r.n_territorios) }}</strong><br>territorios</div>
+  <div class="col-6 col-lg-3"><strong>{{ "{:,}".format(r.total_registros) }}</strong><br>registros</div>
+  <div class="col-6 col-lg-3"><strong>{{ "{:,}".format(r.total_pasajeros) }}</strong><br>pasajeros</div>
+  <div class="col-6 col-lg-3"><strong>{{ r.top5 }}%</strong><br>en los 5 primeros</div>
+</div>
+
+<h2>Los 15 territorios con más pasajeros</h2>
+<div style="position: relative; height: 420px;"><canvas id="grafica"></canvas></div>
+
+<h2 class="mt-5">Mayores y menores</h2>
+<ul>
+  <li><strong>Más pasajeros:</strong> {{ r.mayor.territorio }} ({{ "{:,}".format(r.mayor.pasajeros) }}; {{ r.mayor.pct }}%).</li>
+    <li><strong>Menos pasajeros (entre territorios con 100 o más registros):</strong> {{ r.menor.territorio }} ({{ "{:,}".format(r.menor.pasajeros) }}).</li>
+  {% if r.tabla|length > 1 %}<li><strong>Frente al segundo:</strong> {{ r.mayor.territorio }} mueve {{ "{:,.1f}".format(r.mayor.pasajeros / r.tabla[1].pasajeros) }} veces los pasajeros de {{ r.tabla[1].territorio }}.</li>{% endif %}
+  <li><strong>Más registros:</strong> {{ r.mayor_reg.territorio }} ({{ "{:,}".format(r.mayor_reg.registros) }}; {{ r.mayor_reg.pct_reg }}%).</li>
+  <li><strong>Menos registros:</strong> {{ r.menor_reg.territorio }} ({{ "{:,}".format(r.menor_reg.registros) }}).</li>
+   {% if r.n_sin_pasajeros > 0 %}<li><strong>Sin pasajeros:</strong> {{ r.n_sin_pasajeros }} {{ 'territorio' if r.n_sin_pasajeros == 1 else 'territorios' }}, de los cuales {{ r.n_solo_carga }} mueven solo carga.</li>{% endif %}
+
+<h2 class="mt-5">Concentración</h2>
+<p>Los 5 primeros territorios reúnen el {{ r.top5 }}% de los pasajeros. El índice de concentración es {{ r.hhi }} (cerca de 0 es reparto parejo y 1 es todo en un solo territorio).</p>
+
+<h2 class="mt-5">Participación de cada territorio</h2>
+<input id="buscar" type="search" class="form-control mb-2" style="max-width: 320px;" placeholder="Buscar territorio...">
+<div class="table-responsive" style="max-height: 480px; overflow: auto;">
+  <table class="table table-hover align-middle" id="tabla">
+    <thead><tr>
+      <th>Territorio</th><th class="text-end">Registros</th><th class="text-end">Pasajeros</th>
+      <th class="text-end">Participación</th><th class="text-end">Acumulado</th><th class="text-end">Carga (kg)</th>
+    </tr></thead>
+    <tbody>
+    {% for f in r.tabla %}
+      <tr>
+        <td>{{ f.territorio }}</td>
+        <td class="text-end">{{ "{:,}".format(f.registros) }}</td>
+        <td class="text-end">{{ "{:,}".format(f.pasajeros) }}</td>
+        <td class="text-end">{{ f.pct }}%</td>
+        <td class="text-end">{{ f.acum }}%</td>
+        <td class="text-end">{{ "{:,}".format(f.carga) }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<h2 class="mt-5">Diferencias y comportamientos particulares</h2>
+<p>Las dos primeras listas consideran territorios con al menos 100 registros.</p>
+<div class="row g-4">
+  <div class="col-lg-4">
+    <h3 class="h5">Más carga por pasajero</h3>
+    <ol>{% for f in r.mas_carga %}<li>{{ f.territorio }}: {{ "{:,.1f}".format(f.kg_por_pas) }} kg por pasajero</li>{% endfor %}</ol>
+  </div>
+  <div class="col-lg-4">
+    <h3 class="h5">Mayor promedio de pasajeros por registro</h3>
+    <ol>{% for f in r.mas_llenos %}<li>{{ f.territorio }}: {{ "{:,.1f}".format(f.pas_por_reg) }}</li>{% endfor %}</ol>
+  </div>
+  <div class="col-lg-4">
+    <h3 class="h5">Mayor carga total</h3>
+    <ol>{% for f in r.top_carga %}<li>{{ f.territorio }}: {{ "{:,}".format(f.carga) }} kg</li>{% endfor %}</ol>
+  </div>
+</div>
+
+<h2 class="mt-5">Conclusiones</h2>
+<ul>
+  <li>{{ r.mayor.territorio }} lidera con el {{ r.mayor.pct }}% de los pasajeros, y los 5 primeros territorios suman el {{ r.top5 }}%.</li>
+    <li>Con {{ r.n_territorios }} territorios, los 5 primeros reúnen el {{ r.top5 }}% de los pasajeros: concentración {{ 'alta' if r.top5 > 50 else 'moderada' if r.top5 > 30 else 'baja' }} en pocos nodos (índice de concentración {{ r.hhi }}).</li>
+  <li>{{ r.n_pequenos }} de {{ r.n_territorios }} territorios tienen menos de 100 registros: la actividad se concentra en pocas ciudades y el resto son destinos o zonas con muy poco tráfico.</li>
+    {% if r.n_sin_pasajeros > 0 %}<li>{{ r.n_sin_pasajeros }} {{ 'territorio no registra' if r.n_sin_pasajeros == 1 else 'territorios no registran' }} pasajeros: su actividad es de carga o hay datos faltantes.</li>{% endif %}
+</ul>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+{% if not error %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script>
+  const datos = {{ r.grafica|tojson }};
+  new Chart(document.getElementById('grafica'), {
+    type: 'bar',
+    data: {
+      labels: datos.map(d => d.territorio),
+      datasets: [{ label: 'Pasajeros', data: datos.map(d => d.pasajeros), backgroundColor: '#1F5F7A' }]
+    },
+    options: { indexAxis: 'y', maintainAspectRatio: false, plugins: { legend: { display: false } } }
+  });
+
+  document.getElementById('buscar').addEventListener('input', e => {
+    const q = e.target.value.toLowerCase();
+    document.querySelectorAll('#tabla tbody tr').forEach(tr => {
+      tr.style.display = tr.cells[0].textContent.toLowerCase().includes(q) ? '' : 'none';
+    });
+  });
+</script>
+{% endif %}
+{% endblock %}
