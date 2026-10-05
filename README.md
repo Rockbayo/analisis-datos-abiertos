@@ -7,7 +7,6 @@ Con el propósito de garantizar la integridad del código y mantener el control 
 1. **Sincronización del entorno local:** Antes de iniciar cualquier tarea, es obligatorio actualizar el repositorio local ejecutando `git checkout main` seguido de `git pull`.
 
 **Desarrollo aislado (Feature Branches):** Cada integrante debe trabajar exclusivamente en la rama asignada a su dimensión de análisis:
-   - Integrante 1: `feature/dimension-poblacional`
    - Oscar_Robayo_Rol_1: `feature/dimension-poblacional`
    - Carlos_Pinilla_rol_2: `feature/dimension-territorial`
    - Miguel_Munar_rol_3_4: `feature/dimension-temporal`, `feature/dimension-multivariada`.
