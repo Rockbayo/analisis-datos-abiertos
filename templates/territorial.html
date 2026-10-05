@@ -1,119 +1,119 @@
-{% extends "base.html" %}
-{% block titulo %}Dimensión territorial{% endblock %}
-{% block contenido %}
-<h1>Dimensión territorial</h1>
-<p>¿Cómo se distribuye la población y sus principales características entre los territorios disponibles?</p>
+<h2 class="mt-5">Interpretación de las visualizaciones</h2>
 
-<form method="get" class="row g-3 mb-4">
-  <div class="col-md-5">
-    <label for="nivel" class="form-label">Ver por</label>
-    <select id="nivel" name="nivel" class="form-select" onchange="this.form.submit()">
-      {% for k, v in niveles.items() %}<option value="{{ k }}" {{ 'selected' if k == nivel }}>{{ v }}</option>{% endfor %}
-    </select>
-  </div>
-  <div class="col-md-4">
-    <label for="ambito" class="form-label">Ámbito</label>
-    <select id="ambito" name="ambito" class="form-select" onchange="this.form.submit()">
-      {% for k, v in ambitos.items() %}<option value="{{ k }}" {{ 'selected' if k == ambito }}>{{ v }}</option>{% endfor %}
-    </select>
-  </div>
-</form>
-
-{% if error %}
-<div class="alert alert-warning">{{ error }}</div>
-{% else %}
-<div class="row g-3 mb-4">
-  <div class="col-6 col-lg-3"><strong>{{ "{:,}".format(r.n_territorios) }}</strong><br>territorios</div>
-  <div class="col-6 col-lg-3"><strong>{{ "{:,}".format(r.total_registros) }}</strong><br>registros</div>
-  <div class="col-6 col-lg-3"><strong>{{ "{:,}".format(r.total_pasajeros) }}</strong><br>pasajeros</div>
-  <div class="col-6 col-lg-3"><strong>{{ r.top5 }}%</strong><br>en los 5 primeros</div>
+<div class="card mb-3">
+    <div class="card-body">
+        <h5>Visualización 1: Territorios con más pasajeros</h5>
+        <p>
+            Esta gráfica permite identificar los territorios que concentran la mayor cantidad de pasajeros.
+            Si unos pocos territorios reúnen la mayor parte de los pasajeros, se evidencia una concentración
+            territorial importante de la actividad.
+        </p>
+    </div>
 </div>
 
-<h2>Los 15 territorios con más pasajeros</h2>
-<div style="position: relative; height: 420px;"><canvas id="grafica"></canvas></div>
-
-<h2 class="mt-5">Mayores y menores</h2>
-<ul>
-  <li><strong>Más pasajeros:</strong> {{ r.mayor.territorio }} ({{ "{:,}".format(r.mayor.pasajeros) }}; {{ r.mayor.pct }}%).</li>
-    <li><strong>Menos pasajeros (entre territorios con 100 o más registros):</strong> {{ r.menor.territorio }} ({{ "{:,}".format(r.menor.pasajeros) }}).</li>
-  {% if r.tabla|length > 1 %}<li><strong>Frente al segundo:</strong> {{ r.mayor.territorio }} mueve {{ "{:,.1f}".format(r.mayor.pasajeros / r.tabla[1].pasajeros) }} veces los pasajeros de {{ r.tabla[1].territorio }}.</li>{% endif %}
-  <li><strong>Más registros:</strong> {{ r.mayor_reg.territorio }} ({{ "{:,}".format(r.mayor_reg.registros) }}; {{ r.mayor_reg.pct_reg }}%).</li>
-  <li><strong>Menos registros:</strong> {{ r.menor_reg.territorio }} ({{ "{:,}".format(r.menor_reg.registros) }}).</li>
-   {% if r.n_sin_pasajeros > 0 %}<li><strong>Sin pasajeros:</strong> {{ r.n_sin_pasajeros }} {{ 'territorio' if r.n_sin_pasajeros == 1 else 'territorios' }}, de los cuales {{ r.n_solo_carga }} mueven solo carga.</li>{% endif %}
-
-<h2 class="mt-5">Concentración</h2>
-<p>Los 5 primeros territorios reúnen el {{ r.top5 }}% de los pasajeros. El índice de concentración es {{ r.hhi }} (cerca de 0 es reparto parejo y 1 es todo en un solo territorio).</p>
-
-<h2 class="mt-5">Participación de cada territorio</h2>
-<input id="buscar" type="search" class="form-control mb-2" style="max-width: 320px;" placeholder="Buscar territorio...">
-<div class="table-responsive" style="max-height: 480px; overflow: auto;">
-  <table class="table table-hover align-middle" id="tabla">
-    <thead><tr>
-      <th>Territorio</th><th class="text-end">Registros</th><th class="text-end">Pasajeros</th>
-      <th class="text-end">Participación</th><th class="text-end">Acumulado</th><th class="text-end">Carga (kg)</th>
-    </tr></thead>
-    <tbody>
-    {% for f in r.tabla %}
-      <tr>
-        <td>{{ f.territorio }}</td>
-        <td class="text-end">{{ "{:,}".format(f.registros) }}</td>
-        <td class="text-end">{{ "{:,}".format(f.pasajeros) }}</td>
-        <td class="text-end">{{ f.pct }}%</td>
-        <td class="text-end">{{ f.acum }}%</td>
-        <td class="text-end">{{ "{:,}".format(f.carga) }}</td>
-      </tr>
-    {% endfor %}
-    </tbody>
-  </table>
+<div class="card mb-3">
+    <div class="card-body">
+        <h5>Visualización 2: Participación territorial</h5>
+        <p>
+            La tabla de participación muestra el porcentaje que aporta cada territorio al total de pasajeros.
+            Esto permite comparar la importancia relativa de cada territorio dentro del conjunto analizado.
+        </p>
+    </div>
 </div>
 
-<h2 class="mt-5">Diferencias y comportamientos particulares</h2>
-<p>Las dos primeras listas consideran territorios con al menos 100 registros.</p>
-<div class="row g-4">
-  <div class="col-lg-4">
-    <h3 class="h5">Más carga por pasajero</h3>
-    <ol>{% for f in r.mas_carga %}<li>{{ f.territorio }}: {{ "{:,.1f}".format(f.kg_por_pas) }} kg por pasajero</li>{% endfor %}</ol>
-  </div>
-  <div class="col-lg-4">
-    <h3 class="h5">Mayor promedio de pasajeros por registro</h3>
-    <ol>{% for f in r.mas_llenos %}<li>{{ f.territorio }}: {{ "{:,.1f}".format(f.pas_por_reg) }}</li>{% endfor %}</ol>
-  </div>
-  <div class="col-lg-4">
-    <h3 class="h5">Mayor carga total</h3>
-    <ol>{% for f in r.top_carga %}<li>{{ f.territorio }}: {{ "{:,}".format(f.carga) }} kg</li>{% endfor %}</ol>
-  </div>
+<div class="card mb-3">
+    <div class="card-body">
+        <h5>Visualización 3: Diferencias y comportamientos particulares</h5>
+        <p>
+            Los indicadores de carga transportada y promedio de pasajeros permiten identificar territorios
+            con características especiales que pueden diferenciarse del comportamiento general.
+        </p>
+    </div>
 </div>
 
-<h2 class="mt-5">Conclusiones</h2>
-<ul>
-  <li>{{ r.mayor.territorio }} lidera con el {{ r.mayor.pct }}% de los pasajeros, y los 5 primeros territorios suman el {{ r.top5 }}%.</li>
-    <li>Con {{ r.n_territorios }} territorios, los 5 primeros reúnen el {{ r.top5 }}% de los pasajeros: concentración {{ 'alta' if r.top5 > 50 else 'moderada' if r.top5 > 30 else 'baja' }} en pocos nodos (índice de concentración {{ r.hhi }}).</li>
-  <li>{{ r.n_pequenos }} de {{ r.n_territorios }} territorios tienen menos de 100 registros: la actividad se concentra en pocas ciudades y el resto son destinos o zonas con muy poco tráfico.</li>
-    {% if r.n_sin_pasajeros > 0 %}<li>{{ r.n_sin_pasajeros }} {{ 'territorio no registra' if r.n_sin_pasajeros == 1 else 'territorios no registran' }} pasajeros: su actividad es de carga o hay datos faltantes.</li>{% endif %}
-</ul>
-{% endif %}
-{% endblock %}
+<h2 class="mt-5">Conocimientos evidentes</h2>
 
-{% block scripts %}
-{% if not error %}
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
-<script>
-  const datos = {{ r.grafica|tojson }};
-  new Chart(document.getElementById('grafica'), {
-    type: 'bar',
-    data: {
-      labels: datos.map(d => d.territorio),
-      datasets: [{ label: 'Pasajeros', data: datos.map(d => d.pasajeros), backgroundColor: '#1F5F7A' }]
-    },
-    options: { indexAxis: 'y', maintainAspectRatio: false, plugins: { legend: { display: false } } }
-  });
+<div class="card mb-4">
+    <div class="card-header">
+        <strong>Conocimiento Evidente 1</strong>
+    </div>
+    <div class="card-body">
+        <p><strong>Pregunta:</strong> ¿Qué territorio concentra la mayor cantidad de pasajeros?</p>
 
-  document.getElementById('buscar').addEventListener('input', e => {
-    const q = e.target.value.toLowerCase();
-    document.querySelectorAll('#tabla tbody tr').forEach(tr => {
-      tr.style.display = tr.cells[0].textContent.toLowerCase().includes(q) ? '' : 'none';
-    });
-  });
-</script>
-{% endif %}
-{% endblock %}
+        <p><strong>Variables:</strong> Territorio y pasajeros.</p>
+
+        <p><strong>Procedimiento:</strong> Se agruparon los registros por territorio y se calculó el total de pasajeros transportados.</p>
+
+        <p><strong>Evidencia:</strong> Gráfico de territorios con más pasajeros y tabla de participación.</p>
+
+        <p><strong>Hallazgo:</strong> {{ r.mayor.territorio }} registra la mayor cantidad de pasajeros con una participación de {{ r.mayor.pct }}%.</p>
+
+        <p><strong>Interpretación:</strong> Existe una concentración importante de la actividad en este territorio.</p>
+
+        <p><strong>Utilidad:</strong> Permite identificar territorios prioritarios para la asignación de recursos.</p>
+
+        <p><strong>Limitación:</strong> No explica los factores que originan esta concentración.</p>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header">
+        <strong>Conocimiento Evidente 2</strong>
+    </div>
+    <div class="card-body">
+        <p><strong>Pregunta:</strong> ¿La actividad se distribuye de manera equilibrada entre los territorios?</p>
+
+        <p><strong>Variables:</strong> Territorio, pasajeros y porcentaje de participación.</p>
+
+        <p><strong>Procedimiento:</strong> Se calcularon los porcentajes de participación y la concentración acumulada por territorio.</p>
+
+        <p><strong>Evidencia:</strong> Indicador Top 5 e índice de concentración territorial.</p>
+
+        <p><strong>Hallazgo:</strong> Los cinco principales territorios concentran el {{ r.top5 }}% de los pasajeros.</p>
+
+        <p><strong>Interpretación:</strong> La actividad no se distribuye de forma uniforme entre todos los territorios.</p>
+
+        <p><strong>Utilidad:</strong> Facilita la identificación de territorios estratégicos para la planeación.</p>
+
+        <p><strong>Limitación:</strong> La concentración observada no permite determinar causas específicas.</p>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header">
+        <strong>Conocimiento Evidente 3</strong>
+    </div>
+    <div class="card-body">
+        <p><strong>Pregunta:</strong> ¿Existen territorios con comportamientos particulares?</p>
+
+        <p><strong>Variables:</strong> Territorio, pasajeros, registros y carga.</p>
+
+        <p><strong>Procedimiento:</strong> Se compararon indicadores de carga por pasajero, pasajeros por registro y carga total.</p>
+
+        <p><strong>Evidencia:</strong> Tablas de diferencias y comportamientos particulares.</p>
+
+        <p><strong>Hallazgo:</strong> Algunos territorios presentan niveles de carga y promedios de pasajeros superiores al promedio general.</p>
+
+        <p><strong>Interpretación:</strong> Algunos territorios presentan dinámicas especiales que requieren análisis específico.</p>
+
+        <p><strong>Utilidad:</strong> Permite diseñar estrategias diferenciadas según las características territoriales.</p>
+
+        <p><strong>Limitación:</strong> El análisis descriptivo no permite establecer relaciones de causa y efecto.</p>
+    </div>
+</div>
+
+<h2 class="mt-5">Limitación del análisis</h2>
+
+<div class="alert alert-warning">
+    El análisis depende de la calidad y cobertura de los registros disponibles.
+    La existencia de datos faltantes o territorios con pocos registros puede afectar
+    algunas conclusiones obtenidas.
+</div>
+
+<h2 class="mt-5">Posible decisión sustentada en los datos</h2>
+
+<div class="alert alert-success">
+    Priorizar recursos, infraestructura y estrategias operativas en los territorios
+    que concentran la mayor cantidad de pasajeros, sin descuidar aquellos territorios
+    que presentan comportamientos particulares o potencial de crecimiento.
+</div>SSS
