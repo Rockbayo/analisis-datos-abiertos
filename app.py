@@ -4,6 +4,7 @@ from pathlib import Path
 
 import pandas as pd
 from flask import Flask, render_template, request
+from analisis.Temporal.analisisTemporal import obtener_datos_temporal
 
 BASE_DIR = Path(__file__).resolve().parent
 DATA_FILE = BASE_DIR / "data" / "cielos_abiertos_limpio.csv.gz"
@@ -82,7 +83,7 @@ def inicio():
 @app.route('/analisis/poblacional')
 def poblacional():
     # 1. Cargar el dataset
-    df = pd.read_csv('data/vuelos2.csv')
+    df = pd.read_csv('data/vuelos2.csv.gz')
     
     # Limpieza de pasajeros para KPIs
     if 'pasajeros' in df.columns:
@@ -209,7 +210,11 @@ def territorial():
 
 @app.route("/analisis/temporal")
 def temporal():
-    return render_template("temporal.html")
+    trafico = request.args.get("trafico", "todos")
+    anio_ini = request.args.get("anio_ini", type=int)
+    anio_fin = request.args.get("anio_fin", type=int)
+    datos = obtener_datos_temporal(trafico=trafico, anio_ini=anio_ini, anio_fin=anio_fin)
+    return render_template("temporal.html", datos=datos)
 
 
 @app.route("/analisis/relacional")

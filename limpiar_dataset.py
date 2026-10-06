@@ -8,12 +8,11 @@ Escribe:  data/cielos_abiertos_limpio.csv.gz           (este sí va a Git)
 """
 import unicodedata
 from pathlib import Path
-
 import pandas as pd
 
 BASE = Path(__file__).resolve().parent
-ENTRADA = BASE / "data" / "Cielos_Abiertos_Colombia_20261002.csv"
-SALIDA = BASE / "data" / "cielos_abiertos_limpio.csv.gz"
+ENTRADA = BASE / "data" / "vuelos2.csv.gz"
+SALIDA = BASE / "data" / "cielos_abiertvos_limpio.csv.gz"
 
 # Pon True solo si el equipo decide eliminar filas idénticas (puede cambiar los totales).
 QUITAR_DUPLICADOS = False
