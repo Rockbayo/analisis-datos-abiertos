@@ -193,3 +193,5 @@ if __name__ == "__main__":
     rutas = generar_imagenes()
     for r in rutas:
         print(f"Generada: {r}")
+
+
