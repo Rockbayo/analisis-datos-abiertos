@@ -79,9 +79,57 @@ def inicio():
     return render_template("index.html")
 
 
-@app.route("/analisis/poblacional")
+@app.route('/analisis/poblacional')
 def poblacional():
-    return render_template("poblacional.html")
+    # 1. Cargar el dataset
+    df = pd.read_csv('data/vuelos2.csv')
+    
+    # Limpieza de pasajeros para KPIs
+    if 'pasajeros' in df.columns:
+        df['pasajeros'] = df['pasajeros'].astype(str).str.replace(',', '')
+        df['pasajeros'] = pd.to_numeric(df['pasajeros'], errors='coerce').fillna(0)
+        promedio_pas = int(df['pasajeros'].mean())
+    else:
+        promedio_pas = 0
+        
+    total_operaciones = len(df)
+    total_aerolineas = df['nombre_aerolinea'].nunique()
+    
+    # Top 5 Aerolíneas (%) y el resto en "Otras" para evidenciar oligopolio
+    aero_counts = df['nombre_aerolinea'].value_counts(normalize=True) * 100
+    top_aero = aero_counts.head(5)
+    otras_pct = aero_counts.iloc[5:].sum()
+    
+    aero_labels = top_aero.index.tolist() + [f"Otras ({total_aerolineas - 5})"]
+    aero_values = top_aero.values.round(1).tolist() + [round(otras_pct, 1)]
+
+    # Top 3 Tipos de Vuelo (%)
+    vuelos = df['tipo_vuelo'].value_counts(normalize=True).head(3) * 100
+    
+    # Top 5 Ciudades (%)
+    ciudades = df['ciudad_origen'].value_counts(normalize=True).head(5) * 100
+
+    datos_dinamicos = {
+        "kpis": {
+            "operaciones": f"{total_operaciones:,}",
+            "aerolineas": total_aerolineas,
+            "promedio_pasajeros": promedio_pas
+        },
+        "aerolineas": {
+            "etiquetas": aero_labels,
+            "valores": aero_values 
+        },
+        "vuelos": {
+            "etiquetas": vuelos.index.tolist(),
+            "valores": vuelos.values.round(1).tolist()
+        },
+        "ciudades": {
+            "etiquetas": ciudades.index.tolist(),
+            "valores": ciudades.values.round(1).tolist()
+        }
+    }
+
+    return render_template('poblacional.html', datos=datos_dinamicos)
 
 
 @app.route("/analisis/territorial")

@@ -1,6 +1,233 @@
 {% extends "base.html" %}
-{% block titulo %}Dimensión poblacional{% endblock %}
+{% block titulo %}Dimensión Poblacional{% endblock %}
 {% block contenido %}
-<h1>Dimensión poblacional</h1>
-<p>Pendiente: análisis de esta dimensión.</p>
+
+<div class="mb-4 mt-3">
+    <h1 class="fw-bold" style="color: var(--tinta);">Dimensión Poblacional</h1>
+    <p class="text-muted">Panorama general de la composición y distribución del mercado aéreo.</p>
+</div>
+
+<!-- KPIs -->
+<div class="row mb-4">
+    <div class="col-md-4 mb-3">
+        <div class="card shadow-sm border-0 h-100" style="border-left: 4px solid var(--tinta) !important;">
+            <div class="card-body">
+                <h6 class="text-muted text-uppercase mb-1" style="font-size: 0.85rem; letter-spacing: 0.5px;">Total Operaciones</h6>
+                <h2 class="mb-0 fw-bold" style="color: var(--tinta);">{{ datos.kpis.operaciones }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="card shadow-sm border-0 h-100" style="border-left: 4px solid var(--agua) !important;">
+            <div class="card-body">
+                <h6 class="text-muted text-uppercase mb-1" style="font-size: 0.85rem; letter-spacing: 0.5px;">Aerolíneas Registradas</h6>
+                <h2 class="mb-0 fw-bold" style="color: var(--agua);">{{ datos.kpis.aerolineas }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="card shadow-sm border-0 h-100" style="border-left: 4px solid var(--ambar) !important;">
+            <div class="card-body">
+                <h6 class="text-muted text-uppercase mb-1" style="font-size: 0.85rem; letter-spacing: 0.5px;">Promedio Pasajeros / Vuelo</h6>
+                <h2 class="mb-0 fw-bold" style="color: var(--ambar);">{{ datos.kpis.promedio_pasajeros }}</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Resumen Ejecutivo -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="p-4 rounded shadow-sm" style="background-color: #f8f9fa; border-left: 4px solid var(--tinta);">
+            <h5 class="fw-bold mb-2" style="color: var(--tinta);">Resumen General</h5>
+            <p class="mb-0 text-secondary" style="font-size: 0.95rem; line-height: 1.6;">
+                Al analizar los datos, vemos que el mercado está muy dominado por unas pocas aerolíneas que operan la gran mayoría de los vuelos regulares comerciales. Además, notamos un claro embudo de conexiones en Bogotá, mientras que un grupo grande de operadores más pequeños se encarga de conectar las regiones apartadas o realizar vuelos específicos y chárter.
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- Main Dashboard Grid -->
+<div class="row g-4 mb-5">
+    
+    <!-- Concentración del Mercado -->
+    <div class="col-lg-7">
+        <div class="card shadow-sm border-0 h-100 d-flex flex-column">
+            <div class="card-header bg-white border-0 pt-4 pb-0">
+                <h5 class="fw-bold mb-0" style="color: var(--tinta);">Participación por Aerolínea</h5>
+                <p class="text-muted small">Nivel de concentración del mercado aéreo</p>
+            </div>
+            <div class="card-body flex-grow-1">
+                <div style="position: relative; height: 300px; width: 100%;">
+                    <canvas id="graficaAerolineas"></canvas>
+                </div>
+            </div>
+            <!-- Insight Footer -->
+            <div class="card-footer bg-white border-top-0 pt-0 pb-4 px-4">
+                <div class="p-3 rounded" style="background-color: rgba(22, 50, 79, 0.04);">
+                    <p class="mb-0 text-muted" style="font-size: 0.85rem; line-height: 1.5;">
+                        <span style="font-size: 1.1rem; vertical-align: middle;">💡</span> 
+                        <strong>Dato interesante:</strong> Aunque unas pocas aerolíneas lideran el volumen de vuelos masivos, la barra de "Otras" agrupa a más de 160 empresas pequeñas. Esto nos dice que hay muchos competidores enfocándose en nichos y rutas no convencionales, con porciones de mercado muy bajas.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tipos de Vuelo -->
+    <div class="col-lg-5">
+        <div class="card shadow-sm border-0 h-100 d-flex flex-column">
+            <div class="card-header bg-white border-0 pt-4 pb-0">
+                <h5 class="fw-bold mb-0" style="color: var(--tinta);">Tipos de Vuelo</h5>
+                <p class="text-muted small">Distribución de las operaciones</p>
+            </div>
+            <div class="card-body d-flex align-items-center justify-content-center flex-grow-1">
+                <div style="position: relative; height: 280px; width: 100%;">
+                    <canvas id="graficaVuelos"></canvas>
+                </div>
+            </div>
+            <!-- Insight Footer -->
+            <div class="card-footer bg-white border-top-0 pt-0 pb-4 px-4">
+                <div class="p-3 rounded" style="background-color: rgba(22, 50, 79, 0.04);">
+                    <p class="mb-0 text-muted" style="font-size: 0.85rem; line-height: 1.5;">
+                        <span style="font-size: 1.1rem; vertical-align: middle;">💡</span> 
+                        <strong>Para tener en cuenta:</strong> Casi todas las operaciones registradas son vuelos regulares. Esto significa que nuestra infraestructura está enfocada casi totalmente en rutas fijas, dejando muy poco margen para vuelos especiales.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Concentración Territorial -->
+    <div class="col-lg-12">
+        <div class="card shadow-sm border-0 h-100 d-flex flex-column">
+            <div class="card-header bg-white border-0 pt-4 pb-0">
+                <h5 class="fw-bold mb-0" style="color: var(--tinta);">Principales Ciudades de Origen</h5>
+                <p class="text-muted small">Distribución geográfica de los despegues</p>
+            </div>
+            <div class="card-body flex-grow-1">
+                <div style="position: relative; height: 320px; width: 100%;">
+                    <canvas id="graficaCiudades"></canvas>
+                </div>
+            </div>
+            <!-- Insight Footer -->
+            <div class="card-footer bg-white border-top-0 pt-0 pb-4 px-4">
+                <div class="p-3 rounded" style="background-color: rgba(22, 50, 79, 0.04);">
+                    <p class="mb-0 text-muted" style="font-size: 0.85rem; line-height: 1.5;">
+                        <span style="font-size: 1.1rem; vertical-align: middle;">💡</span> 
+                        <strong>Problema logístico:</strong> Es evidente que el sistema depende demasiado de Bogotá. A nivel de ingeniería de rutas, esto genera ineficiencias porque cualquier falla técnica o climática en la capital causa retrasos en cadena en todo el país.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    const datosRecibidos = {{ datos | tojson }};
+
+    // Paleta de colores variada y profesional para las barras
+    const paletaBarras = ['#16324F', '#1F5F7A', '#3A7CA5', '#81C3D7', '#E3A008', '#e2e8f0'];
+
+    const tooltipOptionsX = {
+        callbacks: {
+            label: function(context) {
+                return ' ' + context.parsed.x + '%';
+            }
+        }
+    };
+    
+    const tooltipOptionsY = {
+        callbacks: {
+            label: function(context) {
+                return ' ' + context.parsed.y + '%';
+            }
+        }
+    };
+
+    // Tooltip especial para la torta
+    const tooltipDoughnut = {
+        callbacks: {
+            label: function(context) {
+                return ' ' + context.parsed + '%';
+            }
+        }
+    };
+
+    new Chart(document.getElementById('graficaAerolineas'), {
+        type: 'bar',
+        data: {
+            labels: datosRecibidos.aerolineas.etiquetas,
+            datasets: [{
+                label: 'Participación',
+                data: datosRecibidos.aerolineas.valores,
+                backgroundColor: paletaBarras,
+                borderRadius: 4
+            }]
+        },
+        options: {
+            maintainAspectRatio: false,
+            indexAxis: 'y', 
+            plugins: { 
+                legend: { display: false },
+                tooltip: tooltipOptionsX
+            },
+            scales: {
+                x: { grid: { display: false } },
+                y: { grid: { display: false } }
+            }
+        }
+    });
+
+    new Chart(document.getElementById('graficaVuelos'), {
+        type: 'doughnut',
+        data: {
+            labels: datosRecibidos.vuelos.etiquetas,
+            datasets: [{
+                data: datosRecibidos.vuelos.valores,
+                backgroundColor: ['#16324F', '#1F5F7A', '#E3A008'],
+                borderWidth: 0,
+                hoverOffset: 4
+            }]
+        },
+        options: {
+            maintainAspectRatio: false,
+            cutout: '65%',
+            plugins: { 
+                legend: { position: 'bottom' },
+                tooltip: tooltipDoughnut
+            }
+        }
+    });
+
+    new Chart(document.getElementById('graficaCiudades'), {
+        type: 'bar',
+        data: {
+            labels: datosRecibidos.ciudades.etiquetas,
+            datasets: [{
+                label: 'Participación',
+                data: datosRecibidos.ciudades.valores,
+                backgroundColor: paletaBarras, 
+                borderRadius: 4,
+                barPercentage: 0.5
+            }]
+        },
+        options: {
+            maintainAspectRatio: false,
+            plugins: { 
+                legend: { display: false },
+                tooltip: tooltipOptionsY
+            },
+            scales: {
+                x: { grid: { display: false } },
+                y: { grid: { borderDash: [5, 5] } }
+            }
+        }
+    });
+</script>
 {% endblock %}
