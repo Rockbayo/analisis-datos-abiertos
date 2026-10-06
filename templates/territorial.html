@@ -19,8 +19,8 @@
   </div>
 </form>
 
-{% if error %}
-<div class="alert alert-warning">{{ error }}</div>
+{% if error or not r %}
+<div class="alert alert-warning">{{ error or 'No se pudieron calcular los datos.' }}</div>
 {% else %}
 <div class="row g-3 mb-4">
   <div class="col-6 col-lg-3"><strong>{{ "{:,}".format(r.n_territorios) }}</strong><br>territorios</div>
@@ -35,11 +35,12 @@
 <h2 class="mt-5">Mayores y menores</h2>
 <ul>
   <li><strong>Más pasajeros:</strong> {{ r.mayor.territorio }} ({{ "{:,}".format(r.mayor.pasajeros) }}; {{ r.mayor.pct }}%).</li>
-    <li><strong>Menos pasajeros (entre territorios con 100 o más registros):</strong> {{ r.menor.territorio }} ({{ "{:,}".format(r.menor.pasajeros) }}).</li>
+  <li><strong>Menos pasajeros (entre territorios con 100 o más registros):</strong> {{ r.menor.territorio }} ({{ "{:,}".format(r.menor.pasajeros) }}).</li>
   {% if r.tabla|length > 1 %}<li><strong>Frente al segundo:</strong> {{ r.mayor.territorio }} mueve {{ "{:,.1f}".format(r.mayor.pasajeros / r.tabla[1].pasajeros) }} veces los pasajeros de {{ r.tabla[1].territorio }}.</li>{% endif %}
   <li><strong>Más registros:</strong> {{ r.mayor_reg.territorio }} ({{ "{:,}".format(r.mayor_reg.registros) }}; {{ r.mayor_reg.pct_reg }}%).</li>
   <li><strong>Menos registros:</strong> {{ r.menor_reg.territorio }} ({{ "{:,}".format(r.menor_reg.registros) }}).</li>
-   {% if r.n_sin_pasajeros > 0 %}<li><strong>Sin pasajeros:</strong> {{ r.n_sin_pasajeros }} {{ 'territorio' if r.n_sin_pasajeros == 1 else 'territorios' }}, de los cuales {{ r.n_solo_carga }} mueven solo carga.</li>{% endif %}
+  {% if r.n_sin_pasajeros > 0 %}<li><strong>Sin pasajeros:</strong> {{ r.n_sin_pasajeros }} {{ 'territorio' if r.n_sin_pasajeros == 1 else 'territorios' }}, de los cuales {{ r.n_solo_carga }} mueven solo carga.</li>{% endif %}
+</ul>
 
 <h2 class="mt-5">Concentración</h2>
 <p>Los 5 primeros territorios reúnen el {{ r.top5 }}% de los pasajeros. El índice de concentración es {{ r.hhi }} (cerca de 0 es reparto parejo y 1 es todo en un solo territorio).</p>
@@ -87,15 +88,16 @@
 <h2 class="mt-5">Conclusiones</h2>
 <ul>
   <li>{{ r.mayor.territorio }} lidera con el {{ r.mayor.pct }}% de los pasajeros, y los 5 primeros territorios suman el {{ r.top5 }}%.</li>
-    <li>Con {{ r.n_territorios }} territorios, los 5 primeros reúnen el {{ r.top5 }}% de los pasajeros: concentración {{ 'alta' if r.top5 > 50 else 'moderada' if r.top5 > 30 else 'baja' }} en pocos nodos (índice de concentración {{ r.hhi }}).</li>
+  <li>Con {{ r.n_territorios }} territorios, los 5 primeros reúnen el {{ r.top5 }}% de los pasajeros: concentración {{ 'alta' if r.top5 > 50 else 'moderada' if r.top5 > 30 else 'baja' }} en pocos nodos (índice de concentración {{ r.hhi }}).</li>
   <li>{{ r.n_pequenos }} de {{ r.n_territorios }} territorios tienen menos de 100 registros: la actividad se concentra en pocas ciudades y el resto son destinos o zonas con muy poco tráfico.</li>
-    {% if r.n_sin_pasajeros > 0 %}<li>{{ r.n_sin_pasajeros }} {{ 'territorio no registra' if r.n_sin_pasajeros == 1 else 'territorios no registran' }} pasajeros: su actividad es de carga o hay datos faltantes.</li>{% endif %}
+  {% if r.top_carga|length >= 3 %}<li>{{ r.top_carga[0].territorio }} concentra la mayor carga ({{ "{:,}".format(r.top_carga[0].carga) }} kg), por delante de {{ r.top_carga[1].territorio }} y {{ r.top_carga[2].territorio }}.</li>{% endif %}
+  {% if r.n_sin_pasajeros > 0 %}<li>{{ r.n_sin_pasajeros }} {{ 'territorio no registra' if r.n_sin_pasajeros == 1 else 'territorios no registran' }} pasajeros: su actividad es de carga o hay datos faltantes.</li>{% endif %}
 </ul>
 {% endif %}
 {% endblock %}
 
 {% block scripts %}
-{% if not error %}
+{% if r and not error %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
 <script>
   const datos = {{ r.grafica|tojson }};
