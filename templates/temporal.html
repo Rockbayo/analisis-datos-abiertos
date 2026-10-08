@@ -1,236 +1,220 @@
 {% extends "base.html" %}
 {% block titulo %}Dimensión temporal{% endblock %}
+{% block titulo_barra %}Dimensión temporal{% endblock %}
 {% block contenido %}
 
-<div class="mb-4 mt-3">
-    <h1 class="fw-bold" style="color: var(--tinta);">Dimensión temporal</h1>
-    <p class="text-muted">¿Cómo ha cambiado el comportamiento de la población durante el periodo disponible?</p>
+<header class="page-header">
+  <p class="overline mb-1">Análisis · Temporal</p>
+  <h1>Dimensión temporal</h1>
+  <p class="context-line">Periodo {{ datos.anio_ini }}–{{ datos.anio_fin }} · Tráfico: {{ datos.traficos[datos.trafico] }} · Unidad: pasajeros</p>
+  <p class="lede">¿Cómo ha cambiado el comportamiento de la población durante el periodo disponible?</p>
+</header>
+
+<div class="card mb-4">
+  <div class="card-header">
+    <h2 class="card-title">Variables utilizadas</h2>
+    <p class="card-subtitle">Granularidad mensual · 2017-01 a 2026-02</p>
+  </div>
+  <div class="card-body">
+    <p class="mb-0"><strong>fecha / periodo:</strong> mes del registro · <strong>anio:</strong> año del registro · <strong>mes:</strong> mes calendario 1-12 (estacionalidad) · <strong>pasajeros:</strong> variable numérica principal · <strong>trafico:</strong> NACIONAL / INTERNACIONAL (filtro). Lógica de cálculo en <code>analisis/resumenData.py</code> y <code>analisis/Temporal/analisisTemporal.py</code>.</p>
+  </div>
 </div>
 
-<!-- Variables utilizadas -->
-<div class="p-4 rounded shadow-sm mb-4" style="background-color: #f8f9fa; border-left: 4px solid var(--tinta);">
-    <h5 class="fw-bold mb-2" style="color: var(--tinta);">Variables utilizadas</h5>
-    <p class="mb-0 text-secondary" style="font-size: 0.9rem; line-height: 1.6;">
-        <strong>fecha / periodo:</strong> mes del registro (granularidad mensual, 2017-01 a 2026-02) ·
-        <strong>anio:</strong> año del registro · <strong>mes:</strong> mes calendario 1-12 (estacionalidad) ·
-        <strong>pasajeros:</strong> variable numérica principal ·
-        <strong>trafico:</strong> NACIONAL / INTERNACIONAL (filtro).
-        Lógica de cálculo en <code>analisis/resumenData.py</code> y
-        <code>analisis/Temporal/analisisTemporal.py</code>.
-    </p>
-</div>
-
-<!-- Filtros interactivos (2) -->
 <form method="get" class="row g-3 mb-4">
-    <div class="col-md-4">
-        <label for="trafico" class="form-label">Tipo de tráfico</label>
-        <select id="trafico" name="trafico" class="form-select" onchange="this.form.submit()">
-            {% for k, v in datos.traficos.items() %}
-            <option value="{{ k }}" {{ 'selected' if k == datos.trafico }}>{{ v }}</option>
-            {% endfor %}
-        </select>
-    </div>
-    <div class="col-md-4">
-        <label for="anio_ini" class="form-label">Año inicial</label>
-        <select id="anio_ini" name="anio_ini" class="form-select" onchange="this.form.submit()">
-            {% for a in datos.anios %}
-            <option value="{{ a }}" {{ 'selected' if a == datos.anio_ini }}>{{ a }}</option>
-            {% endfor %}
-        </select>
-    </div>
-    <div class="col-md-4">
-        <label for="anio_fin" class="form-label">Año final</label>
-        <select id="anio_fin" name="anio_fin" class="form-select" onchange="this.form.submit()">
-            {% for a in datos.anios %}
-            <option value="{{ a }}" {{ 'selected' if a == datos.anio_fin }}>{{ a }}</option>
-            {% endfor %}
-        </select>
-    </div>
+  <div class="col-12 col-md-4">
+    <label for="trafico" class="form-label">Tipo de tráfico</label>
+    <select id="trafico" name="trafico" class="form-select" onchange="this.form.submit()">
+      {% for k, v in datos.traficos.items() %}
+      <option value="{{ k }}" {{ 'selected' if k == datos.trafico }}>{{ v }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-12 col-md-4">
+    <label for="anio_ini" class="form-label">Año inicial</label>
+    <select id="anio_ini" name="anio_ini" class="form-select" onchange="this.form.submit()">
+      {% for a in datos.anios %}
+      <option value="{{ a }}" {{ 'selected' if a == datos.anio_ini }}>{{ a }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-12 col-md-4">
+    <label for="anio_fin" class="form-label">Año final</label>
+    <select id="anio_fin" name="anio_fin" class="form-select" onchange="this.form.submit()">
+      {% for a in datos.anios %}
+      <option value="{{ a }}" {{ 'selected' if a == datos.anio_fin }}>{{ a }}</option>
+      {% endfor %}
+    </select>
+  </div>
 </form>
 
 {% if datos.vacio %}
 <div class="alert alert-warning">No hay datos con esos filtros. Ajusta el rango de años o el tráfico.</div>
 {% else %}
 
-<!-- 3 indicadores -->
-<div class="row mb-4">
-    <div class="col-md-4 mb-3">
-        <div class="card shadow-sm border-0 h-100" style="border-left: 4px solid var(--tinta) !important;">
-            <div class="card-body">
-                <h6 class="text-muted text-uppercase mb-1" style="font-size: 0.85rem; letter-spacing: 0.5px;">Año pico (pasajeros)</h6>
-                <h2 class="mb-0 fw-bold" style="color: var(--tinta);">{{ datos.kpis.anio_pico }}</h2>
-                <p class="text-muted small mb-0">{{ "{:,}".format(datos.kpis.pas_pico) }} pasajeros · valle: {{ datos.kpis.anio_valle }}</p>
-            </div>
-        </div>
+<div class="row g-3 g-xl-4 mb-4">
+  <div class="col-12 col-sm-6 col-xl-4">
+    <div class="card h-100">
+      <div class="card-body">
+        <p class="kpi-label">Año pico (pasajeros)</p>
+        <p class="kpi-value mono">{{ datos.kpis.anio_pico }}</p>
+        <p class="kpi-delta">{{ "{:,}".format(datos.kpis.pas_pico) }} pasajeros · valle: {{ datos.kpis.anio_valle }}</p>
+      </div>
     </div>
-    <div class="col-md-4 mb-3">
-        <div class="card shadow-sm border-0 h-100" style="border-left: 4px solid var(--agua) !important;">
-            <div class="card-body">
-                <h6 class="text-muted text-uppercase mb-1" style="font-size: 0.85rem; letter-spacing: 0.5px;">Caída 2020 vs 2019</h6>
-                <h2 class="mb-0 fw-bold" style="color: var(--agua);">{% if datos.kpis.caida_2020 is not none %}{{ datos.kpis.caida_2020 }}%{% else %}N/D{% endif %}</h2>
-                <p class="text-muted small mb-0">Efecto pandemia en pasajeros</p>
-            </div>
-        </div>
+  </div>
+  <div class="col-12 col-sm-6 col-xl-4">
+    <div class="card h-100">
+      <div class="card-body">
+        <p class="kpi-label">Caída 2020 vs 2019</p>
+        <p class="kpi-value mono">{% if datos.kpis.caida_2020 is not none %}{{ datos.kpis.caida_2020 }}%{% else %}N/D{% endif %}</p>
+        <p class="kpi-delta">Efecto pandemia en pasajeros</p>
+      </div>
     </div>
-    <div class="col-md-4 mb-3">
-        <div class="card shadow-sm border-0 h-100" style="border-left: 4px solid var(--ambar) !important;">
-            <div class="card-body">
-                <h6 class="text-muted text-uppercase mb-1" style="font-size: 0.85rem; letter-spacing: 0.5px;">Mes estacional pico</h6>
-                <h2 class="mb-0 fw-bold" style="color: var(--ambar);">{{ datos.kpis.mes_pico }}</h2>
-                <p class="text-muted small mb-0">Valle estacional: {{ datos.kpis.mes_valle }}</p>
-            </div>
-        </div>
+  </div>
+  <div class="col-12 col-sm-6 col-xl-4">
+    <div class="card h-100">
+      <div class="card-body">
+        <p class="kpi-label">Mes estacional pico</p>
+        <p class="kpi-value">{{ datos.kpis.mes_pico }}</p>
+        <p class="kpi-delta">Valle estacional: {{ datos.kpis.mes_valle }}</p>
+      </div>
     </div>
+  </div>
 </div>
 
-<!-- 3 visualizaciones -->
-<div class="row g-4 mb-5">
-    <div class="col-lg-6">
-        <div class="card shadow-sm border-0 h-100 d-flex flex-column">
-            <div class="card-header bg-white border-0 pt-4 pb-0">
-                <h5 class="fw-bold mb-0" style="color: var(--tinta);">1. Evolución anual de pasajeros</h5>
-                <p class="text-muted small">Periodos con mayor y menor cantidad · aumentos y disminuciones</p>
-            </div>
-            <div class="card-body flex-grow-1">
-                <div style="position: relative; height: 280px;"><canvas id="grafAnual"></canvas></div>
-            </div>
-            <div class="card-footer bg-white border-top-0 pt-0 pb-4 px-4">
-                <div class="p-3 rounded" style="background-color: rgba(22, 50, 79, 0.04);">
-                    <p class="mb-0 text-muted" style="font-size: 0.85rem; line-height: 1.5;">
-                        <strong>Interpretación:</strong> se observa una caída abrupta en 2020 (pandemia) y una
-                        recuperación sostenida desde 2021 hasta el pico en {{ datos.kpis.anio_pico }}.
-                        El año valle es {{ datos.kpis.anio_valle }}. El patrón es en forma de "V": choque externo
-                        seguido de rebote, no un cambio estructural de la demanda.
-                    </p>
-                </div>
-            </div>
-        </div>
+<div class="row g-3 g-xl-4 mb-4">
+  <div class="col-12 col-xl-6">
+    <div class="card h-100 d-flex flex-column">
+      <div class="card-header">
+        <h2 class="card-title">1. Evolución anual de pasajeros</h2>
+        <p class="card-subtitle">Periodos con mayor y menor cantidad · aumentos y disminuciones</p>
+        <p class="chart-meta mb-0"><span class="live-dot" aria-hidden="true"></span><span class="updated-at">Datos del dataset cargado</span></p>
+      </div>
+      <div class="card-body flex-grow-1">
+        <div class="chart-wrap"><canvas id="grafAnual" role="img" aria-label="Barras con la evolución anual de pasajeros"></canvas></div>
+      </div>
+      <div class="card-footer">
+        <div class="insight-box"><strong>Interpretación:</strong> se observa una caída abrupta en 2020 (pandemia) y una recuperación sostenida desde 2021 hasta el pico en {{ datos.kpis.anio_pico }}. El año valle es {{ datos.kpis.anio_valle }}. Patrón en “V”: choque externo seguido de rebote.</div>
+      </div>
     </div>
-    <div class="col-lg-6">
-        <div class="card shadow-sm border-0 h-100 d-flex flex-column">
-            <div class="card-header bg-white border-0 pt-4 pb-0">
-                <h5 class="fw-bold mb-0" style="color: var(--tinta);">2. Estacionalidad por mes calendario</h5>
-                <p class="text-muted small">Comportamientos repetitivos: enero y diciembre concentran viajes</p>
-            </div>
-            <div class="card-body flex-grow-1">
-                <div style="position: relative; height: 280px;"><canvas id="grafEstacional"></canvas></div>
-            </div>
-            <div class="card-footer bg-white border-top-0 pt-0 pb-4 px-4">
-                <div class="p-3 rounded" style="background-color: rgba(22, 50, 79, 0.04);">
-                    <p class="mb-0 text-muted" style="font-size: 0.85rem; line-height: 1.5;">
-                        <strong>Interpretación:</strong> el pico estacional es {{ datos.kpis.mes_pico }} y el valle
-                        {{ datos.kpis.mes_valle }}. Diciembre-enero suben por vacaciones de fin de año y junio-agosto
-                        repuntan por vacaciones de mitad de año: estacionalidad repetitiva ligada al calendario
-                        vacacional colombiano.
-                    </p>
-                </div>
-            </div>
-        </div>
+  </div>
+  <div class="col-12 col-xl-6">
+    <div class="card h-100 d-flex flex-column">
+      <div class="card-header">
+        <h2 class="card-title">2. Estacionalidad por mes calendario</h2>
+        <p class="card-subtitle">Comportamientos repetitivos: enero y diciembre concentran viajes</p>
+        <p class="chart-meta mb-0"><span class="live-dot" aria-hidden="true"></span><span class="updated-at">Datos del dataset cargado</span></p>
+      </div>
+      <div class="card-body flex-grow-1">
+        <div class="chart-wrap"><canvas id="grafEstacional" role="img" aria-label="Línea con la estacionalidad mensual de pasajeros"></canvas></div>
+      </div>
+      <div class="card-footer">
+        <div class="insight-box"><strong>Interpretación:</strong> el pico estacional es {{ datos.kpis.mes_pico }} y el valle {{ datos.kpis.mes_valle }}. Diciembre-enero suben por vacaciones de fin de año y junio-agosto repuntan por vacaciones de mitad de año.</div>
+      </div>
     </div>
-    <div class="col-lg-12">
-        <div class="card shadow-sm border-0 h-100 d-flex flex-column">
-            <div class="card-header bg-white border-0 pt-4 pb-0">
-                <h5 class="fw-bold mb-0" style="color: var(--tinta);">3. Serie mensual completa (YYYY-MM)</h5>
-                <p class="text-muted small">Comparación entre periodos · cambios importantes mes a mes</p>
-            </div>
-            <div class="card-body flex-grow-1">
-                <div style="position: relative; height: 280px;"><canvas id="grafSerie"></canvas></div>
-            </div>
-            <div class="card-footer bg-white border-top-0 pt-0 pb-4 px-4">
-                <div class="p-3 rounded" style="background-color: rgba(22, 50, 79, 0.04);">
-                    <p class="mb-0 text-muted" style="font-size: 0.85rem; line-height: 1.5;">
-                        <strong>Interpretación:</strong> la serie confirma el desplome de 2020 (mínimo histórico)
-                        y la recuperación posterior con tendencia creciente. Los dientes de sierra mensuales reflejan
-                        la estacionalidad; no hay meses atípicos fuera de 2020-2021, lo que indica estabilidad operativa
-                        una vez superado el choque.
-                    </p>
-                </div>
-            </div>
-        </div>
+  </div>
+  <div class="col-12">
+    <div class="card h-100 d-flex flex-column">
+      <div class="card-header">
+        <h2 class="card-title">3. Serie mensual completa (YYYY-MM)</h2>
+        <p class="card-subtitle">Comparación entre periodos · cambios importantes mes a mes</p>
+        <p class="chart-meta mb-0"><span class="live-dot" aria-hidden="true"></span><span class="updated-at">Datos del dataset cargado</span></p>
+      </div>
+      <div class="card-body flex-grow-1">
+        <div class="chart-wrap"><canvas id="grafSerie" role="img" aria-label="Serie mensual completa de pasajeros"></canvas></div>
+      </div>
+      <div class="card-footer">
+        <div class="insight-box"><strong>Interpretación:</strong> la serie confirma el desplome de 2020 y la recuperación posterior con tendencia creciente. Los dientes de sierra mensuales reflejan la estacionalidad; no hay meses atípicos fuera de 2020-2021.</div>
+      </div>
     </div>
+  </div>
 </div>
 
-<!-- Tabla anual de respaldo -->
-<div class="card shadow-sm border-0 mb-5">
-    <div class="card-header bg-white border-0 pt-4 pb-0">
-        <h5 class="fw-bold mb-0" style="color: var(--tinta);">Tabla anual (evidencia)</h5>
-        <p class="text-muted small">Registros y pasajeros por año con el filtro actual</p>
+<div class="card mb-4">
+  <div class="card-header">
+    <h2 class="card-title">Tabla anual (evidencia)</h2>
+    <p class="card-subtitle">Registros y pasajeros por año con el filtro actual</p>
+  </div>
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead><tr><th>Año</th><th class="num">Registros</th><th class="num">Pasajeros</th></tr></thead>
+        <tbody>
+        {% for f in datos.tabla_anual %}
+          <tr><td class="mono">{{ f.año }}</td><td class="num">{{ "{:,}".format(f.registros) }}</td><td class="num">{{ "{:,}".format(f.pasajeros) }}</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
     </div>
+  </div>
+</div>
+
+<div class="mb-4">
+  <h2 class="mb-3">Conocimientos evidentes</h2>
+
+  <div class="card mb-3">
     <div class="card-body">
-        <div class="table-responsive" style="max-height: 320px; overflow: auto;">
-            <table class="table table-hover align-middle">
-                <thead><tr><th>Año</th><th class="text-end">Registros</th><th class="text-end">Pasajeros</th></tr></thead>
-                <tbody>
-                {% for f in datos.tabla_anual %}
-                    <tr><td>{{ f.año }}</td><td class="text-end">{{ "{:,}".format(f.registros) }}</td><td class="text-end">{{ "{:,}".format(f.pasajeros) }}</td></tr>
-                {% endfor %}
-                </tbody>
-            </table>
-        </div>
+      <h3 class="card-title mb-2">C1. La pandemia partió la serie en dos (2020)</h3>
+      <p class="small subtitle mb-1"><strong>Pregunta:</strong> ¿qué año rompe la tendencia y en cuánto?</p>
+      <p class="small subtitle mb-1"><strong>Variables:</strong> anio × pasajeros.</p>
+      <p class="small subtitle mb-1"><strong>Procedimiento:</strong> se sumaron pasajeros por año y se comparó 2020 vs 2019.</p>
+      <p class="small subtitle mb-1"><strong>Evidencia:</strong> gráfica 1 y tabla anual; caída 2020 vs 2019 de {% if datos.kpis.caida_2020 is not none %}{{ datos.kpis.caida_2020 }}%{% else %}~50%{% endif %}.</p>
+      <p class="small subtitle mb-1"><strong>Hallazgo:</strong> 2020 es el mínimo histórico de la serie.</p>
+      <p class="small subtitle mb-1"><strong>Interpretación:</strong> choque externo (restricciones COVID), no caída de demanda estructural.</p>
+      <p class="small subtitle mb-1"><strong>Utilidad:</strong> excluir 2020 al proyectar demanda futura o modelarlo como variable de choque.</p>
+      <p class="small subtitle mb-0"><strong>Limitación:</strong> no se puede atribuir cuánto fue restricción legal vs miedo a viajar.</p>
     </div>
+  </div>
+
+  <div class="card mb-3">
+    <div class="card-body">
+      <h3 class="card-title mb-2">C2. Diciembre-enero es la temporada alta repetitiva</h3>
+      <p class="small subtitle mb-1"><strong>Pregunta:</strong> ¿qué meses concentran más pasajeros cada año?</p>
+      <p class="small subtitle mb-1"><strong>Variables:</strong> mes × pasajeros (sumando todos los años).</p>
+      <p class="small subtitle mb-1"><strong>Procedimiento:</strong> se agregó pasajeros por mes calendario 1-12.</p>
+      <p class="small subtitle mb-1"><strong>Evidencia:</strong> gráfica 2; pico en {{ datos.kpis.mes_pico }}, valle en {{ datos.kpis.mes_valle }}.</p>
+      <p class="small subtitle mb-1"><strong>Hallazgo:</strong> fin de año supera al resto de meses de forma sistemática.</p>
+      <p class="small subtitle mb-1"><strong>Interpretación:</strong> vacaciones de fin de año y puentes festivos concentran viajes.</p>
+      <p class="small subtitle mb-1"><strong>Utilidad:</strong> reforzar flota y personal en diciembre-enero; programar mantenimiento en {{ datos.kpis.mes_valle }}.</p>
+      <p class="small subtitle mb-0"><strong>Limitación:</strong> no distingue si el pico es turismo, retorno familiar o tarifas.</p>
+    </div>
+  </div>
+
+  <div class="card mb-3">
+    <div class="card-body">
+      <h3 class="card-title mb-2">C3. La recuperación superó el nivel prepandemia</h3>
+      <p class="small subtitle mb-1"><strong>Pregunta:</strong> ¿la demanda volvió al nivel anterior a 2020?</p>
+      <p class="small subtitle mb-1"><strong>Variables:</strong> periodo (YYYY-MM) × pasajeros, filtro por tráfico.</p>
+      <p class="small subtitle mb-1"><strong>Procedimiento:</strong> se comparó el año pico ({{ datos.kpis.anio_pico }}) con 2018-2019 en la serie mensual.</p>
+      <p class="small subtitle mb-1"><strong>Evidencia:</strong> gráfica 3; niveles 2024-2025 por encima de 2017-2019.</p>
+      <p class="small subtitle mb-1"><strong>Hallazgo:</strong> crecimiento sostenido 2021-{{ datos.kpis.anio_pico }} que supera la base prepandemia.</p>
+      <p class="small subtitle mb-1"><strong>Interpretación:</strong> demanda recuperada y ampliada; el mercado aéreo creció tras el choque.</p>
+      <p class="small subtitle mb-1"><strong>Utilidad:</strong> justificar ampliación de capacidad y nuevas rutas con datos.</p>
+      <p class="small subtitle mb-0"><strong>Limitación:</strong> 2026 está incompleto (solo ene-feb) y no puede compararse como año pleno.</p>
+    </div>
+  </div>
 </div>
 
-<!-- 3 conocimientos evidentes -->
-<div class="mb-5">
-    <h2 class="fw-bold mb-3" style="color: var(--tinta);">Conocimientos evidentes</h2>
-
-    <div class="card shadow-sm border-0 mb-3">
-        <div class="card-body">
-            <h5 class="fw-bold" style="color: var(--tinta);">C1. La pandemia partió la serie en dos (2020)</h5>
-            <p class="small text-muted mb-1"><strong>Pregunta:</strong> ¿qué año rompe la tendencia y en cuánto?</p>
-            <p class="small text-muted mb-1"><strong>Variables:</strong> anio × pasajeros.</p>
-            <p class="small text-muted mb-1"><strong>Procedimiento:</strong> se sumaron pasajeros por año y se comparó 2020 vs 2019.</p>
-            <p class="small text-muted mb-1"><strong>Evidencia:</strong> gráfica 1 y tabla anual; caída 2020 vs 2019 de {% if datos.kpis.caida_2020 is not none %}{{ datos.kpis.caida_2020 }}%{% else %}~50%{% endif %}.</p>
-            <p class="small text-muted mb-1"><strong>Hallazgo:</strong> 2020 es el mínimo histórico de la serie.</p>
-            <p class="small text-muted mb-1"><strong>Interpretación:</strong> choque externo (restricciones COVID), no caída de demanda estructural.</p>
-            <p class="small text-muted mb-1"><strong>Utilidad:</strong> excluir 2020 al proyectar demanda futura o modelarlo como variable de choque.</p>
-            <p class="small text-muted mb-0"><strong>Limitación:</strong> no se puede atribuir cuánto fue restricción legal vs miedo a viajar.</p>
-        </div>
+<div class="row g-3 g-xl-4 mb-4">
+  <div class="col-12 col-md-6">
+    <div class="card h-100">
+      <div class="card-header">
+        <h2 class="card-title">Limitación del análisis</h2>
+      </div>
+      <div class="card-body">
+        <p class="mb-0 subtitle">El dataset agrega registros por mes sin distinguir causas (tarifas, oferta de sillas, festivos móviles como Semana Santa). 2026 solo trae enero-febrero, así que su total anual no es comparable. Tampoco se controla por crecimiento de flota.</p>
+      </div>
     </div>
-
-    <div class="card shadow-sm border-0 mb-3">
-        <div class="card-body">
-            <h5 class="fw-bold" style="color: var(--tinta);">C2. Diciembre-enero es la temporada alta repetitiva</h5>
-            <p class="small text-muted mb-1"><strong>Pregunta:</strong> ¿qué meses concentran más pasajeros cada año?</p>
-            <p class="small text-muted mb-1"><strong>Variables:</strong> mes × pasajeros (sumando todos los años).</p>
-            <p class="small text-muted mb-1"><strong>Procedimiento:</strong> se agregó pasajeros por mes calendario 1-12.</p>
-            <p class="small text-muted mb-1"><strong>Evidencia:</strong> gráfica 2; pico en {{ datos.kpis.mes_pico }}, valle en {{ datos.kpis.mes_valle }}.</p>
-            <p class="small text-muted mb-1"><strong>Hallazgo:</strong> fin de año supera al resto de meses de forma sistemática.</p>
-            <p class="small text-muted mb-1"><strong>Interpretación:</strong> vacaciones de fin de año y puentes festivos concentran viajes.</p>
-            <p class="small text-muted mb-1"><strong>Utilidad:</strong> reforzar flota y personal en diciembre-enero; programar mantenimiento en {{ datos.kpis.mes_valle }}.</p>
-            <p class="small text-muted mb-0"><strong>Limitación:</strong> no distingue si el pico es turismo, retorno familiar o tarifas.</p>
-        </div>
+  </div>
+  <div class="col-12 col-md-6">
+    <div class="card h-100">
+      <div class="card-header">
+        <h2 class="card-title">Posible decisión sustentada</h2>
+      </div>
+      <div class="card-body">
+        <p class="mb-0 subtitle">Programar el mantenimiento mayor en el mes valle ({{ datos.kpis.mes_valle }}) y reforzar tripulación y slots en {{ datos.kpis.mes_pico }}, porque la estacionalidad se repite y la demanda ya superó el nivel prepandemia (pico en {{ datos.kpis.anio_pico }}).</p>
+      </div>
     </div>
-
-    <div class="card shadow-sm border-0 mb-3">
-        <div class="card-body">
-            <h5 class="fw-bold" style="color: var(--tinta);">C3. La recuperación superó el nivel prepandemia</h5>
-            <p class="small text-muted mb-1"><strong>Pregunta:</strong> ¿la demanda volvió al nivel anterior a 2020?</p>
-            <p class="small text-muted mb-1"><strong>Variables:</strong> periodo (YYYY-MM) × pasajeros, filtro por tráfico.</p>
-            <p class="small text-muted mb-1"><strong>Procedimiento:</strong> se comparó el año pico ({{ datos.kpis.anio_pico }}) con 2018-2019 en la serie mensual.</p>
-            <p class="small text-muted mb-1"><strong>Evidencia:</strong> gráfica 3; niveles 2024-2025 por encima de 2017-2019.</p>
-            <p class="small text-muted mb-1"><strong>Hallazgo:</strong> crecimiento sostenido 2021-{{ datos.kpis.anio_pico }} que supera la base prepandemia.</p>
-            <p class="small text-muted mb-1"><strong>Interpretación:</strong> demanda recuperada y ampliada; el mercado aéreo creció tras el choque.</p>
-            <p class="small text-muted mb-1"><strong>Utilidad:</strong> justificar ampliación de capacidad y nuevas rutas con datos.</p>
-            <p class="small text-muted mb-0"><strong>Limitación:</strong> 2026 está incompleto (solo ene-feb) y no puede compararse como año pleno.</p>
-        </div>
-    </div>
-</div>
-
-<!-- Limitación + decisión -->
-<div class="row g-4 mb-4">
-    <div class="col-md-6">
-        <div class="p-4 rounded shadow-sm h-100" style="background-color: #fff8e6; border-left: 4px solid var(--ambar);">
-            <h5 class="fw-bold mb-2" style="color: var(--tinta);">Limitación del análisis</h5>
-            <p class="mb-0 text-secondary" style="font-size: 0.9rem;">El dataset agrega registros por mes sin distinguir causas (tarifas, oferta de sillas, festivos móviles como Semana Santa). 2026 solo trae enero-febrero, así que su total anual no es comparable. Tampoco se controla por crecimiento de flota: más pasajeros puede ser más oferta, no solo más demanda.</p>
-        </div>
-    </div>
-    <div class="col-md-6">
-        <div class="p-4 rounded shadow-sm h-100" style="background-color: #eef6f4; border-left: 4px solid var(--agua);">
-            <h5 class="fw-bold mb-2" style="color: var(--tinta);">Posible decisión sustentada</h5>
-            <p class="mb-0 text-secondary" style="font-size: 0.9rem;">Programar el mantenimiento mayor de aeronaves en el mes valle ({{ datos.kpis.mes_valle }}) y reforzar tripulación y slots en {{ datos.kpis.mes_pico }}, porque la estacionalidad se repite todos los años y la demanda ya superó el nivel prepandemia (pico en {{ datos.kpis.anio_pico }}).</p>
-        </div>
-    </div>
+  </div>
 </div>
 
 {% endif %}
@@ -243,31 +227,47 @@
     const anual = {{ datos.anual | tojson }};
     const est = {{ datos.estacional | tojson }};
     const serie = {{ datos.serie | tojson }};
+    const gridColor = 'rgba(63, 141, 134, 0.35)';
+
+    if (window.Chart) {
+        Chart.defaults.font.family = 'Inter, system-ui, sans-serif';
+        Chart.defaults.font.size = 12;
+        Chart.defaults.color = '#bfe5df';
+    }
+
+    const tooltipBase = {
+        backgroundColor: '#184a47',
+        borderColor: '#3f8d86',
+        borderWidth: 1,
+        titleColor: '#f1fbf9',
+        bodyColor: '#f1fbf9',
+        padding: 10
+    };
 
     new Chart(document.getElementById('grafAnual'), {
         type: 'bar',
         data: { labels: anual.etiquetas,
-            datasets: [{ label: 'Pasajeros', data: anual.pasajeros, backgroundColor: '#16324F', borderRadius: 4 }] },
-        options: { maintainAspectRatio: false, plugins: { legend: { display: false } },
-            scales: { x: { grid: { display: false } }, y: { beginAtZero: true } } }
+            datasets: [{ label: 'Pasajeros', data: anual.pasajeros, backgroundColor: '#5eead4', borderRadius: 6, maxBarThickness: 40 }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: tooltipBase },
+            scales: { x: { grid: { display: false }, ticks: { color: '#bfe5df' } }, y: { beginAtZero: true, grid: { color: gridColor }, ticks: { color: '#bfe5df' } } } }
     });
 
     new Chart(document.getElementById('grafEstacional'), {
         type: 'line',
         data: { labels: est.etiquetas,
-            datasets: [{ label: 'Pasajeros', data: est.pasajeros, borderColor: '#1F5F7A',
-                backgroundColor: 'rgba(31,95,122,0.15)', fill: true, tension: 0.3, pointRadius: 4 }] },
-        options: { maintainAspectRatio: false, plugins: { legend: { display: false } },
-            scales: { y: { beginAtZero: true } } }
+            datasets: [{ label: 'Pasajeros', data: est.pasajeros, borderColor: '#5eead4',
+                backgroundColor: 'rgba(94, 234, 212, 0.2)', fill: true, tension: 0.3, pointRadius: 3, pointBackgroundColor: '#5eead4', borderWidth: 2 }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: tooltipBase },
+            scales: { x: { grid: { display: false }, ticks: { color: '#bfe5df' } }, y: { beginAtZero: true, grid: { color: gridColor }, ticks: { color: '#bfe5df' } } } }
     });
 
     new Chart(document.getElementById('grafSerie'), {
         type: 'line',
         data: { labels: serie.etiquetas,
-            datasets: [{ label: 'Pasajeros', data: serie.pasajeros, borderColor: '#E3A008',
-                backgroundColor: 'rgba(227,160,8,0.12)', fill: true, tension: 0.2, pointRadius: 0, borderWidth: 1.5 }] },
-        options: { maintainAspectRatio: false, plugins: { legend: { display: false } },
-            scales: { x: { ticks: { maxTicksLimit: 12 } }, y: { beginAtZero: true } } }
+            datasets: [{ label: 'Pasajeros', data: serie.pasajeros, borderColor: '#fcd34d',
+                backgroundColor: 'rgba(252, 211, 77, 0.2)', fill: true, tension: 0.2, pointRadius: 0, borderWidth: 2 }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: tooltipBase },
+            scales: { x: { grid: { display: false }, ticks: { maxTicksLimit: 12, color: '#bfe5df' } }, y: { beginAtZero: true, grid: { color: gridColor }, ticks: { color: '#bfe5df' } } } }
     });
 </script>
 {% endif %}

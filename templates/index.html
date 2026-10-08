@@ -1,6 +1,93 @@
 {% extends "base.html" %}
-{% block titulo %}Inicio{% endblock %}
+{% block titulo %}Resumen{% endblock %}
+{% block titulo_barra %}Resumen{% endblock %}
 {% block contenido %}
-<h1>Análisis de población por dimensiones</h1>
-<p>Elige una dimensión en el menú.</p>
+<header class="page-header">
+  <p class="overline mb-1">Cielos abiertos · Colombia</p>
+  <h1>Análisis de población por dimensiones</h1>
+  <p class="context-line">Periodo 2017–2026 · Fuente: datos abiertos · Unidad: pasajeros y operaciones</p>
+  <p class="lede">Explora cómo se mueven los pasajeros por aerolínea, territorio y tiempo. Elige una dimensión para ver sus gráficas, tablas y hallazgos.</p>
+</header>
+
+<div class="row g-3 g-xl-4">
+  <div class="col-12 col-sm-6 col-xl-3">
+    <div class="card h-100">
+      <div class="card-body">
+        <p class="kpi-label">Dimensiones</p>
+        <p class="kpi-value">3</p>
+        <p class="kpi-delta">Poblacional · Territorial · Temporal</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-12 col-sm-6 col-xl-3">
+    <div class="card h-100">
+      <div class="card-body">
+        <p class="kpi-label">Cobertura</p>
+        <p class="kpi-value">Nacional</p>
+        <p class="kpi-delta">Origen y destino, con foco en Colombia</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-12 col-sm-6 col-xl-3">
+    <div class="card h-100">
+      <div class="card-body">
+        <p class="kpi-label">Periodo</p>
+        <p class="kpi-value mono">2017–2026</p>
+        <p class="kpi-delta">Granularidad mensual</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-12 col-sm-6 col-xl-3">
+    <div class="card h-100">
+      <div class="card-body">
+        <p class="kpi-label">Unidad</p>
+        <p class="kpi-value">Pasajeros</p>
+        <p class="kpi-delta">Más carga (kg) y registros</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h2 class="mt-4 mb-3">Secciones del análisis</h2>
+<div class="row g-3 g-xl-4">
+  <div class="col-12 col-sm-6 col-xl-4">
+    <a class="card h-100" href="/analisis/poblacional">
+      <div class="card-body d-flex gap-3 align-items-start">
+        <span class="access-icon"><i class="bi bi-people" aria-hidden="true"></i></span>
+        <span>
+          <span class="card-title d-block">Dimensión poblacional</span>
+          <span class="card-subtitle d-block">Concentración por aerolínea, tipo de vuelo y ciudad de origen.</span>
+        </span>
+      </div>
+    </a>
+  </div>
+  <div class="col-12 col-sm-6 col-xl-4">
+    <a class="card h-100" href="/analisis/territorial">
+      <div class="card-body d-flex gap-3 align-items-start">
+        <span class="access-icon"><i class="bi bi-globe-americas" aria-hidden="true"></i></span>
+        <span>
+          <span class="card-title d-block">Dimensión territorial</span>
+          <span class="card-subtitle d-block">Ranking por ciudad, país y aeropuerto, con tabla de detalle.</span>
+        </span>
+      </div>
+    </a>
+  </div>
+  <div class="col-12 col-sm-6 col-xl-4">
+    <a class="card h-100" href="/analisis/temporal">
+      <div class="card-body d-flex gap-3 align-items-start">
+        <span class="access-icon"><i class="bi bi-clock-history" aria-hidden="true"></i></span>
+        <span>
+          <span class="card-title d-block">Dimensión temporal</span>
+          <span class="card-subtitle d-block">Evolución anual, estacionalidad mensual y serie completa.</span>
+        </span>
+      </div>
+    </a>
+  </div>
+</div>
+
+<div class="card mt-4">
+  <div class="card-body">
+    <p class="method-note mb-0">Nota metodológica: las cifras usan separadores locales y fechas dd/mm/aaaa. Cada vista indica su periodo, fuente y unidad antes de la gráfica o tabla.</p>
+  </div>
+</div>
 {% endblock %}

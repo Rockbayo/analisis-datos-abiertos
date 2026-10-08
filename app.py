@@ -16,7 +16,6 @@ DIMENSIONES = [
     {"endpoint": "poblacional", "nombre": "Dimensión poblacional"},
     {"endpoint": "territorial", "nombre": "Dimensión territorial"},
     {"endpoint": "temporal", "nombre": "Dimensión temporal"},
-    {"endpoint": "relacional", "nombre": "Dimensión relacional y multivariada"},
 ]
 
 NIVELES = {
@@ -215,11 +214,6 @@ def temporal():
     anio_fin = request.args.get("anio_fin", type=int)
     datos = obtener_datos_temporal(trafico=trafico, anio_ini=anio_ini, anio_fin=anio_fin)
     return render_template("temporal.html", datos=datos)
-
-
-@app.route("/analisis/relacional")
-def relacional():
-    return render_template("relacional.html")
 
 
 if __name__ == "__main__":
